@@ -17778,15 +17778,16 @@
     />
   </div>
   <div>
-    <input
-      type="tel"
-      class="form_group only_number"
-      name="number"
-      onkeyup="this.value=this.value.replace(/\s/,'')"
-      minlength="5"
-      placeholder="आपका मोबाइल नंबर"
-      required=""
-    />
+<input
+  type="text"
+  inputmode="numeric"
+  class="form_group"
+  name="number"
+  placeholder="आपका मोबाइल नंबर"
+  oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+  maxlength="10"
+  required
+/>
   </div>
   <div>
     <input
