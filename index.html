@@ -9191,12 +9191,12 @@ input:focus {
       }
       .form-group {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
   }
 
   .form-group input {
     width: 100%;
-    padding: 12px 15px;
+    padding: 16px 15px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -9212,7 +9212,7 @@ input:focus {
     color: #ff4d4f;
     font-size: 14px;
     position: absolute;
-    bottom: -22px;
+    bottom: -18px;
     left: 0;
     opacity: 0;
     transition: opacity 0.3s;
@@ -9236,6 +9236,81 @@ input:focus {
   .btn-style:hover {
     background-color: #45a049;
   }
+  
+.form-group {
+  margin-bottom: 15px;
+}
+
+input[type="text"],
+input[type="tel"] {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.btn-style {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-style:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
+
+/* --- Popup --- */
+.popup {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.6);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1000;
+}
+
+.popup.visible {
+  display: flex;
+  opacity: 1;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 40px 60px;
+  border-radius: 12px;
+  text-align: center;
+  transform: scale(0.8);
+  transition: transform 0.3s ease;
+  max-width: 25em;   
+  width: 100%;
+}
+
+.popup.visible .popup-content {
+  transform: scale(1);
+}
+
+.popup-title {
+  margin: 0 0 10px;
+  font-size: 24px;
+  color: #28a745;
+}
+
+.popup-sub {
+  font-size: 18px;
+  color: #333;
+}
+
 
       @media (max-width: 991px) {
         .feedback-list {
@@ -17327,6 +17402,26 @@ input:focus {
     <!--drcash-->
 
     <base href="#" />
+  
+  
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1234319408407207');  
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" 
+    src="https://www.facebook.com/tr?id=1234319408407207&ev=PageView&noscript=1"/>
+  </noscript>
+  <!-- End Meta Pixel Code -->
   </head>
   <body
     oncontextmenu="return false"
@@ -17934,6 +18029,12 @@ input:focus {
     <input class="btn-style" type="submit" value="Submit">
   </div>
 </form>
+<div class="popup" id="thanksPopup">
+    <div class="popup-content">
+      <h2 class="popup-title">✅ Thanks for your order!</h2>
+      <p class="popup-sub">We will contact you shortly.</p>
+    </div>
+  </div>
 <script>
   const form = document.getElementById('myForm');
   const submitButton = form.querySelector('input[type="submit"]');
@@ -20272,6 +20373,78 @@ myForm.addEventListener("submit", function (e) {
     e.preventDefault();
   }
 });
+// --- POPUP LOGIC --- //
+const thanksPopup = document.getElementById("thanksPopup");
+let popupTimer = null;
+
+
+
+function showPopup() {
+  thanksPopup.style.display = "flex";
+  requestAnimationFrame(() => {
+    thanksPopup.classList.add("visible");
+  });
+
+  clearTimeout(popupTimer);
+  popupTimer = setTimeout(hidePopup, 5000); 
+}
+
+
+function hidePopup() {
+  thanksPopup.classList.remove("visible");
+  setTimeout(() => {
+    thanksPopup.style.display = "none";
+  }, 400); 
+}
+
+
+thanksPopup.addEventListener("click", e => {
+  if (e.target === thanksPopup) hidePopup();
+});
+
+
+window.addEventListener("keydown", e => {
+  if (e.key === "Escape") hidePopup();
+});
+
+
+myForm.addEventListener("submit", function (e) {
+  if (!validateName() || !validateNumber() || !validateAddress()) {
+    e.preventDefault();
+  } else {
+    e.preventDefault(); 
+    const formData = new FormData(myForm);
+
+
+    submitBtn.value = "Submitting...";
+
+    fetch(myForm.action, {
+      method: "POST",
+      body: formData,
+      mode: "no-cors"
+    })
+      .then(() => {
+        myForm.reset();
+        submitBtn.value = "Submitted";
+        showPopup();
+
+ 
+        setTimeout(() => {
+          submitBtn.value = "Submit";
+        }, 5000); 
+      })
+      .catch(() => {
+        myForm.reset();
+        submitBtn.value = "Submitted";
+        showPopup();
+
+        setTimeout(() => {
+          submitBtn.value = "Submit";
+        }, 5000);
+      });
+  }
+});
+
 
 </script>
 
