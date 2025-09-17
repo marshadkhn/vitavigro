@@ -9267,49 +9267,59 @@ input[type="tel"] {
   font-size: 12px;
 }
 
-/* --- Popup --- */
-.popup {
+
+    .btn-home {
+      display: inline-block;
+      padding: 12px 25px;
+      background: #28a745;
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 6px;
+      transition: background 0.3s;
+    }
+
+    .btn-home:hover {
+      background: #218838;
+    }
+
+   
+    /* Thank You Overlay Styling */
+#thankYouOverlay {
   position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0,0,0,0.6);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: 1000;
-}
-
-.popup.visible {
-  display: flex;
-  opacity: 1;
-}
-
-.popup-content {
-  background: #fff;
-  padding: 40px 60px;
-  border-radius: 12px;
-  text-align: center;
-  transform: scale(0.8);
-  transition: transform 0.3s ease;
-  max-width: 25em;   
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
 }
 
-.popup.visible .popup-content {
-  transform: scale(1);
+#thankYouOverlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
-.popup-title {
-  margin: 0 0 10px;
-  font-size: 24px;
-  color: #28a745;
+#thankYouOverlay h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  color: green;
 }
 
-.popup-sub {
-  font-size: 18px;
+#thankYouOverlay p {
+  font-size: 1.2rem;
   color: #333;
 }
+
 
 
       @media (max-width: 991px) {
@@ -18029,11 +18039,9 @@ input[type="tel"] {
     <input class="btn-style" type="submit" value="Submit">
   </div>
 </form>
-<div class="popup" id="thanksPopup">
-    <div class="popup-content">
-      <h2 class="popup-title">✅ Thanks for your order!</h2>
-      <p class="popup-sub">We will contact you shortly.</p>
-    </div>
+<div id="thankYouOverlay">
+    <h1>✅ Thank You!</h1>
+    <p>We will contact you shortly.</p>
   </div>
 <script>
   const form = document.getElementById('myForm');
@@ -20281,12 +20289,9 @@ const addressError = document.getElementById("addressError");
 
 const submitBtn = myForm.querySelector('input[type="submit"]'); // Submit button
 
-// Name input: numbers disable + max length 50
+// Name input: numbers disable + max length 20
 nameInput.addEventListener("input", () => {
-  // Remove any digits
   nameInput.value = nameInput.value.replace(/\d/g, '');
-
-  // Limit max length to 50 characters
   if (nameInput.value.length > 20) {
     nameInput.value = nameInput.value.slice(0, 20);
   }
@@ -20297,15 +20302,10 @@ submitBtn.disabled = true;
 
 // Ensure number starts with 6-9 and max 10 digits
 numberInput.addEventListener("input", () => {
-  // Remove non-digit characters
   numberInput.value = numberInput.value.replace(/\D/g, '');
-
-  // Remove first digit if it's less than 6
   if (numberInput.value.length === 1 && !/^[6-9]/.test(numberInput.value)) {
     numberInput.value = '';
   }
-
-  // Limit to 10 digits
   if (numberInput.value.length > 10) {
     numberInput.value = numberInput.value.slice(0, 10);
   }
@@ -20356,56 +20356,48 @@ function validateAddress() {
   }
 }
 
-// Check all validations and enable/disable submit button
+
 function checkFormValidity() {
   const isFormValid = validateName() && validateNumber() && validateAddress();
   submitBtn.disabled = !isFormValid;
 }
 
-// Real-time validation + button enable/disable
+
 nameInput.addEventListener("input", checkFormValidity);
 numberInput.addEventListener("input", checkFormValidity);
 addressInput.addEventListener("input", checkFormValidity);
 
-// Final check on submit
-myForm.addEventListener("submit", function (e) {
-  if (!validateName() || !validateNumber() || !validateAddress()) {
-    e.preventDefault();
-  }
-});
-// --- POPUP LOGIC --- //
-const thanksPopup = document.getElementById("thanksPopup");
-let popupTimer = null;
+
+const thankYouOverlay = document.createElement("div");
+thankYouOverlay.innerHTML = `
+  <div style="text-align:center; animation: fadeIn 1s ease-in-out;">
+    <h1 style="font-size:2.5rem; color:green; margin-bottom:10px auto;">✅ Thank You!</h1>
+    <p style="font-size:1.2rem; color:#333; padding-left:70px">We will contact you shortly.</p>
+  </div>
+`;
+thankYouOverlay.style.position = "fixed";
+thankYouOverlay.style.top = "0";
+thankYouOverlay.style.left = "0";
+thankYouOverlay.style.width = "100%";
+thankYouOverlay.style.height = "100%";
+thankYouOverlay.style.background = "#fff";
+thankYouOverlay.style.display = "flex";
+thankYouOverlay.style.alignItems = "center";
+thankYouOverlay.style.justifyContent = "center";
+thankYouOverlay.style.zIndex = "9999";
+thankYouOverlay.style.opacity = "0";
+thankYouOverlay.style.visibility = "hidden";
+thankYouOverlay.style.transition = "opacity 1s ease, visibility 1s ease";
+document.body.appendChild(thankYouOverlay);
 
 
-
-function showPopup() {
-  thanksPopup.style.display = "flex";
-  requestAnimationFrame(() => {
-    thanksPopup.classList.add("visible");
-  });
-
-  clearTimeout(popupTimer);
-  popupTimer = setTimeout(hidePopup, 5000); 
-}
-
-
-function hidePopup() {
-  thanksPopup.classList.remove("visible");
-  setTimeout(() => {
-    thanksPopup.style.display = "none";
-  }, 400); 
-}
-
-
-thanksPopup.addEventListener("click", e => {
-  if (e.target === thanksPopup) hidePopup();
-});
-
-
-window.addEventListener("keydown", e => {
-  if (e.key === "Escape") hidePopup();
-});
+const style = document.createElement("style");
+style.innerHTML = `
+@keyframes fadeIn {
+  from {opacity:0; transform:scale(0.9);}
+  to {opacity:1; transform:scale(1);}
+}`;
+document.head.appendChild(style);
 
 
 myForm.addEventListener("submit", function (e) {
@@ -20414,7 +20406,6 @@ myForm.addEventListener("submit", function (e) {
   } else {
     e.preventDefault(); 
     const formData = new FormData(myForm);
-
 
     submitBtn.value = "Submitting...";
 
@@ -20426,24 +20417,33 @@ myForm.addEventListener("submit", function (e) {
       .then(() => {
         myForm.reset();
         submitBtn.value = "Submitted";
-        showPopup();
 
- 
-        setTimeout(() => {
-          submitBtn.value = "Submit";
-        }, 5000); 
+
+        thankYouOverlay.style.opacity = "1";
+        thankYouOverlay.style.visibility = "visible";
+
+         setTimeout(() => {
+        if (window.fbq) {
+            fbq('track', 'Lead');
+             console.log("FB Pixel Lead triggered");
+        }
+    }, 1000);
+
       })
+      
       .catch(() => {
         myForm.reset();
         submitBtn.value = "Submitted";
-        showPopup();
 
-        setTimeout(() => {
-          submitBtn.value = "Submit";
-        }, 5000);
+  
+        thankYouOverlay.style.opacity = "1";
+        thankYouOverlay.style.visibility = "visible";
+
       });
   }
 });
+
+
 
 
 </script>
